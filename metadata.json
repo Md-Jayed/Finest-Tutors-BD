@@ -1,0 +1,6 @@
+{
+  "name": "Finest Tutors BD",
+  "description": "Premier tutor registration and tuition platform in Bangladesh connecting qualified university tutors with students and families.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
