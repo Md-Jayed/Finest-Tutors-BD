@@ -48,8 +48,10 @@ export default function App() {
                 {/* Authentication & Portals */}
                 <Route path="/login" element={<LoginPage />} />
                 <Route path="/teacher/dashboard" element={<TeacherDashboardPage />} />
+                <Route path="/teacher-dashboard" element={<Navigate to="/teacher/dashboard" replace />} />
                 <Route path="/dashboard" element={<Navigate to="/teacher/dashboard" replace />} />
                 <Route path="/admin" element={<AdminDashboardPage />} />
+                <Route path="/admin-dashboard" element={<Navigate to="/admin" replace />} />
                 <Route path="/admin/dashboard" element={<Navigate to="/admin" replace />} />
 
                 {/* Fallback to home */}
