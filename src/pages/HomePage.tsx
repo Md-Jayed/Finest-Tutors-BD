@@ -145,7 +145,7 @@ export const HomePage: React.FC = () => {
                   className="w-full sm:w-auto inline-flex items-center justify-center gap-2 px-7 py-4 rounded-2xl font-bold text-base text-[#002B5B] bg-white border border-slate-200 hover:border-cyan-300 hover:bg-cyan-50/50 shadow-xs transition-all duration-200"
                 >
                   <Search className="w-5 h-5 text-cyan-600" />
-                  <span>Explore Tutors</span>
+                  <span>Find Tutors</span>
                 </a>
               </div>
 
@@ -342,8 +342,8 @@ export const HomePage: React.FC = () => {
 
             <div className="grid grid-cols-2 md:grid-cols-4 gap-6 text-center">
               <div className="space-y-1">
-                <p className="text-2xl sm:text-3xl font-extrabold text-[#005B96]">500+</p>
-                <p className="text-xs text-slate-600 font-medium">Tutors in Pipeline</p>
+                <p className="text-2xl sm:text-3xl font-extrabold text-[#005B96]">10000+</p>
+                <p className="text-xs text-slate-600 font-medium">Verified Tutors</p>
               </div>
               <div className="space-y-1">
                 <p className="text-2xl sm:text-3xl font-extrabold text-[#00B4D8]">15+</p>

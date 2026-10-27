@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Link, useNavigate, useLocation } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
+import { Logo } from '../components/common/Logo';
 import { 
   ShieldCheck, 
   Lock, 
@@ -77,10 +78,10 @@ export const LoginPage: React.FC = () => {
     <div className="min-h-[85vh] bg-slate-50 flex items-center justify-center py-12 px-4 sm:px-6 lg:px-8">
       <div className="max-w-md w-full space-y-8">
         {/* Header */}
-        <div className="text-center space-y-2">
-          <div className="inline-flex items-center justify-center w-14 h-14 rounded-2xl bg-gradient-to-tr from-[#002B5B] to-[#0072EA] text-white shadow-lg shadow-blue-500/20 mb-2">
-            <Lock className="w-7 h-7" />
-          </div>
+        <div className="text-center space-y-3">
+          <Link to="/" className="inline-block transition-transform hover:scale-102">
+            <Logo size="lg" />
+          </Link>
           <h1 className="text-2xl sm:text-3xl font-extrabold text-[#002B5B] tracking-tight">
             Portal Sign In
           </h1>
