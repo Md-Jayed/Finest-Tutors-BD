@@ -15,6 +15,7 @@ import { AboutPage } from './pages/AboutPage';
 import { ContactPage } from './pages/ContactPage';
 import { TutorsDirectoryPage } from './pages/TutorsDirectoryPage';
 import { LoginPage } from './pages/LoginPage';
+import { PaymentMethodsPage } from './pages/PaymentMethodsPage';
 import { TeacherDashboardPage } from './pages/TeacherDashboardPage';
 import { AdminDashboardPage } from './pages/AdminDashboardPage';
 
@@ -44,6 +45,8 @@ export default function App() {
                 <Route path="/about" element={<AboutPage />} />
                 <Route path="/contact" element={<ContactPage />} />
                 <Route path="/tutors" element={<TutorsDirectoryPage />} />
+                <Route path="/payment-methods" element={<PaymentMethodsPage />} />
+                <Route path="/payment" element={<Navigate to="/payment-methods" replace />} />
                 
                 {/* Authentication & Portals */}
                 <Route path="/login" element={<LoginPage />} />

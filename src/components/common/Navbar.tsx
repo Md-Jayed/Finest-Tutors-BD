@@ -13,7 +13,8 @@ import {
   Info, 
   MessageSquareQuote,
   Lock,
-  GraduationCap
+  GraduationCap,
+  CreditCard
 } from 'lucide-react';
 
 export const Navbar: React.FC = () => {
@@ -24,6 +25,7 @@ export const Navbar: React.FC = () => {
   const navLinks = [
     { name: 'Home', path: '/', icon: BookOpen },
     { name: 'Find Tutors', path: '/tutors', icon: Search },
+    { name: 'Payment', path: '/payment-methods', icon: CreditCard },
     { name: 'About Us', path: '/about', icon: Info },
     { name: 'Contact', path: '/contact', icon: MessageSquareQuote },
   ];

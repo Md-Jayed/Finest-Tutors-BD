@@ -25,6 +25,7 @@ import {
   Building2,
   CalendarCheck
 } from 'lucide-react';
+import { PaymentMethods } from '../components/common/PaymentMethods';
 
 export const HomePage: React.FC = () => {
   const { approvedTeachers } = useRegistration();
@@ -645,6 +646,13 @@ export const HomePage: React.FC = () => {
               </p>
             </div>
           </div>
+        </div>
+      </section>
+
+      {/* 6. OFFICIAL PAYMENT METHODS SECTION */}
+      <section id="payment-methods" className="py-16 sm:py-24 bg-white border-t border-slate-200/80">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <PaymentMethods showHeader={true} />
         </div>
       </section>
 

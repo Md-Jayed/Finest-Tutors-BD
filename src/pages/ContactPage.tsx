@@ -13,6 +13,7 @@ import {
   Sparkles,
   PhoneCall
 } from 'lucide-react';
+import { PaymentMethods } from '../components/common/PaymentMethods';
 
 export const ContactPage: React.FC = () => {
   const [formData, setFormData] = useState({
@@ -323,6 +324,13 @@ export const ContactPage: React.FC = () => {
               )}
             </div>
           </div>
+        </div>
+      </section>
+
+      {/* Official Payment Methods Section */}
+      <section id="payment-methods" className="py-16 sm:py-20 bg-slate-50/70 border-t border-slate-200">
+        <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
+          <PaymentMethods showHeader={true} />
         </div>
       </section>
 

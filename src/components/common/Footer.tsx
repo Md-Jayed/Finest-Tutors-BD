@@ -67,6 +67,12 @@ export const Footer: React.FC = () => {
                   Contact Us
                 </Link>
               </li>
+              <li>
+                <Link to="/payment-methods" className="hover:text-cyan-400 transition-colors flex items-center gap-1.5">
+                  <ArrowRight className="w-3 h-3 text-cyan-500" />
+                  Payment Methods
+                </Link>
+              </li>
             </ul>
           </div>
 
@@ -121,6 +127,23 @@ export const Footer: React.FC = () => {
               <li className="flex items-center gap-2.5">
                 <Mail className="w-4 h-4 text-cyan-400 shrink-0" />
                 <span>support@finesttutorsbd.com</span>
+              </li>
+              <li className="pt-2 border-t border-slate-800">
+                <Link 
+                  to="/payment-methods" 
+                  className="group block p-2.5 rounded-xl bg-slate-800/80 hover:bg-slate-800 border border-slate-700/80 transition-colors"
+                >
+                  <div className="flex items-center justify-between text-[11px] font-semibold text-slate-200 group-hover:text-cyan-300">
+                    <span>Payment Methods</span>
+                    <span className="text-cyan-400 text-[10px]">bKash • Nagad • Rocket</span>
+                  </div>
+                  <div className="mt-1.5 flex items-center gap-2">
+                    <img src="/assets/aistudio/bkash_4cec4bc3.png" alt="bKash" className="h-4 w-auto bg-white px-1 py-0.5 rounded object-contain" />
+                    <img src="/assets/aistudio/nagad_fa6c4b2e.png" alt="Nagad" className="h-4 w-auto bg-white px-1 py-0.5 rounded object-contain" />
+                    <img src="/assets/aistudio/rocket_13ecbfe6.png" alt="Rocket" className="h-4 w-auto bg-white px-1 py-0.5 rounded object-contain" />
+                    <span className="font-mono text-cyan-300 text-[11px] ml-auto font-bold">01356-542184</span>
+                  </div>
+                </Link>
               </li>
               
             </ul>
