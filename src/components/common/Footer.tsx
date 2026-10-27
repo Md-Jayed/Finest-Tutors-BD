@@ -5,6 +5,7 @@ import {
   ShieldCheck, 
   MapPin, 
   Mail, 
+  Phone,
   Clock, 
   CheckCircle2, 
   ArrowRight,
@@ -109,16 +110,19 @@ export const Footer: React.FC = () => {
             <ul className="space-y-3 text-xs text-slate-300">
               <li className="flex items-start gap-2.5">
                 <MapPin className="w-4 h-4 text-cyan-400 shrink-0 mt-0.5" />
-                <span>Dhaka, Bangladesh<br /><span className="text-slate-400 text-[11px]">(Serving all 64 districts & Online)</span></span>
+                <span>Azimpur-1205,Dhaka, Bangladesh<br /><span className="text-slate-400 text-[11px]">(Serving all 64 districts & Online)</span></span>
+              </li>
+              <li className="flex items-center gap-2.5">
+                <Phone className="w-4 h-4 text-cyan-400 shrink-0" />
+                <a href="tel:01356542184" className="hover:text-cyan-300 font-medium transition-colors">
+                  01356-542184
+                </a>
               </li>
               <li className="flex items-center gap-2.5">
                 <Mail className="w-4 h-4 text-cyan-400 shrink-0" />
                 <span>support@finesttutorsbd.com</span>
               </li>
-              <li className="flex items-center gap-2.5">
-                <Clock className="w-4 h-4 text-cyan-400 shrink-0" />
-                <span>Sat – Thu: 10:00 AM – 8:00 PM</span>
-              </li>
+              
             </ul>
           </div>
         </div>

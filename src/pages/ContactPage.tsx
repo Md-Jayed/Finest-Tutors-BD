@@ -92,14 +92,32 @@ export const ContactPage: React.FC = () => {
             </div>
 
             <div className="space-y-4">
+              <div className="p-5 rounded-2xl bg-cyan-50/70 border border-cyan-200/80 flex items-start gap-4">
+                <div className="w-10 h-10 rounded-xl bg-[#0072EA] text-white flex items-center justify-center shrink-0 shadow-sm">
+                  <PhoneCall className="w-5 h-5" />
+                </div>
+                <div className="space-y-1 text-xs sm:text-sm">
+                  <h4 className="font-bold text-[#002B5B]">Direct Helpline & Support</h4>
+                  <a 
+                    href="tel:01356542184" 
+                    className="text-lg sm:text-xl font-extrabold text-[#0072EA] hover:underline block tracking-tight font-mono"
+                  >
+                    01356-542184
+                  </a>
+                  <p className="text-slate-600 text-xs">
+                    Call our matching desk for instant tuition assistance or teacher queries.
+                  </p>
+                </div>
+              </div>
+
               <div className="p-5 rounded-2xl bg-slate-50 border border-slate-200 flex items-start gap-4">
                 <div className="w-10 h-10 rounded-xl bg-cyan-100 text-cyan-800 flex items-center justify-center shrink-0">
                   <MapPin className="w-5 h-5" />
                 </div>
                 <div className="space-y-1 text-xs sm:text-sm">
                   <h4 className="font-bold text-slate-900">Coordination Hub</h4>
-                  <p className="text-slate-600">
-                    Dhaka, Bangladesh
+                  <p className="text-slate-600 font-medium">
+                    Azimpur-1205, Dhaka, Bangladesh
                   </p>
                   <p className="text-slate-500 text-xs">
                     Serving Dhanmondi, Gulshan, Mirpur, Uttara, Chittagong, and all 64 districts.

@@ -51,7 +51,14 @@ export const Navbar: React.FC = () => {
           </div>
 
           <div className="flex items-center gap-4 text-slate-200 text-[11px]">
-            <span className="flex items-center gap-1 text-emerald-300">
+            <a 
+              href="tel:01356542184" 
+              className="flex items-center gap-1.5 text-cyan-200 hover:text-white transition-colors font-semibold"
+            >
+              <PhoneCall className="w-3.5 h-3.5 text-cyan-300" />
+              <span>01356-542184</span>
+            </a>
+            <span className="hidden md:flex items-center gap-1 text-emerald-300">
               <ShieldCheck className="w-3.5 h-3.5" />
               Verified University Profiles
             </span>
@@ -224,6 +231,14 @@ export const Navbar: React.FC = () => {
             )}
 
             <div className="pt-4 border-t border-slate-100 space-y-2.5">
+              <a
+                href="tel:01356542184"
+                className="w-full flex items-center justify-center gap-2 px-4 py-2.5 rounded-xl text-xs font-bold text-[#005B96] bg-cyan-50 hover:bg-cyan-100 border border-cyan-200 transition-colors"
+              >
+                <PhoneCall className="w-4 h-4 text-cyan-600" />
+                <span>Helpline: 01356-542184</span>
+              </a>
+
               <Link
                 to="/teacher-registration"
                 onClick={() => setMobileMenuOpen(false)}
