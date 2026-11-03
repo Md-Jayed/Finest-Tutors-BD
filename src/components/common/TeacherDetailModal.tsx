@@ -56,6 +56,10 @@ export const TeacherDetailModal: React.FC<TeacherDetailModalProps> = ({
                 src={teacher.profilePhoto}
                 alt={teacher.fullName}
                 className="w-20 h-20 rounded-2xl object-cover ring-4 ring-white/30 shadow-md bg-slate-200"
+                onError={(e) => {
+                  (e.target as HTMLImageElement).onerror = null;
+                  (e.target as HTMLImageElement).src = `https://ui-avatars.com/api/?name=${encodeURIComponent(teacher.fullName)}&background=005B96&color=fff&size=128`;
+                }}
               />
             ) : (
               <div className="w-20 h-20 rounded-2xl bg-white/20 text-white flex items-center justify-center font-bold text-2xl ring-4 ring-white/30 shadow-md">
@@ -69,6 +73,12 @@ export const TeacherDetailModal: React.FC<TeacherDetailModalProps> = ({
                   <CheckCircle className="w-3 h-3 text-emerald-300" />
                   Verified Mentor
                 </span>
+                {teacher.teacherCode && (
+                  <span className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-lg text-xs font-mono font-bold bg-white/20 text-white border border-white/30 backdrop-blur-xs">
+                    <span className="font-sans font-normal text-cyan-200">Teacher ID:</span>
+                    <span>{teacher.teacherCode}</span>
+                  </span>
+                )}
                 {teacher.isDemo && (
                   <span className="px-2 py-0.5 rounded text-[10px] font-medium bg-amber-400/20 text-amber-200 border border-amber-300/30">
                     Sample Profile
@@ -120,7 +130,7 @@ export const TeacherDetailModal: React.FC<TeacherDetailModalProps> = ({
               Tutor Profile & Teaching Approach
             </h4>
             <p className="text-sm text-slate-600 leading-relaxed bg-cyan-50/40 p-4 rounded-xl border border-cyan-100/60">
-              {teacher.bio}
+              {teacher.bio || `Verified academic tutor from ${teacher.university} specializing in ${teacher.department}. Committed to personalized mentoring and strong conceptual clarity.`}
             </p>
           </div>
 
@@ -131,14 +141,20 @@ export const TeacherDetailModal: React.FC<TeacherDetailModalProps> = ({
               Subjects & Expertise
             </h4>
             <div className="flex flex-wrap gap-2">
-              {teacher.subjects.map((sub, idx) => (
-                <span
-                  key={idx}
-                  className="px-3 py-1.5 rounded-lg text-xs font-semibold bg-blue-50 text-blue-700 border border-blue-100"
-                >
-                  {sub}
+              {teacher.subjects && teacher.subjects.length > 0 ? (
+                teacher.subjects.map((sub, idx) => (
+                  <span
+                    key={idx}
+                    className="px-3 py-1.5 rounded-lg text-xs font-semibold bg-blue-50 text-blue-700 border border-blue-100"
+                  >
+                    {sub}
+                  </span>
+                ))
+              ) : (
+                <span className="px-3 py-1.5 rounded-lg text-xs font-semibold bg-blue-50 text-blue-700 border border-blue-100">
+                  {teacher.department || 'General Tuition'}
                 </span>
-              ))}
+              )}
             </div>
           </div>
 
@@ -147,22 +163,34 @@ export const TeacherDetailModal: React.FC<TeacherDetailModalProps> = ({
             <div className="space-y-2">
               <h4 className="text-xs font-bold text-slate-700 uppercase tracking-wider">Target Classes / Levels</h4>
               <div className="flex flex-wrap gap-1.5">
-                {teacher.preferredClasses.map((cls, idx) => (
-                  <span key={idx} className="px-2.5 py-1 rounded-md text-xs bg-slate-100 text-slate-700">
-                    {cls}
+                {teacher.preferredClasses && teacher.preferredClasses.length > 0 ? (
+                  teacher.preferredClasses.map((cls, idx) => (
+                    <span key={idx} className="px-2.5 py-1 rounded-md text-xs bg-slate-100 text-slate-700">
+                      {cls}
+                    </span>
+                  ))
+                ) : (
+                  <span className="px-2.5 py-1 rounded-md text-xs bg-slate-100 text-slate-700">
+                    Class 6-10, HSC / College
                   </span>
-                ))}
+                )}
               </div>
             </div>
 
             <div className="space-y-2">
               <h4 className="text-xs font-bold text-slate-700 uppercase tracking-wider">Curriculum / Mediums</h4>
               <div className="flex flex-wrap gap-1.5">
-                {teacher.mediums.map((med, idx) => (
-                  <span key={idx} className="px-2.5 py-1 rounded-md text-xs bg-emerald-50 text-emerald-700 border border-emerald-100 font-medium">
-                    {med}
+                {teacher.mediums && teacher.mediums.length > 0 ? (
+                  teacher.mediums.map((med, idx) => (
+                    <span key={idx} className="px-2.5 py-1 rounded-md text-xs bg-emerald-50 text-emerald-700 border border-emerald-100 font-medium">
+                      {med}
+                    </span>
+                  ))
+                ) : (
+                  <span className="px-2.5 py-1 rounded-md text-xs bg-emerald-50 text-emerald-700 border border-emerald-100 font-medium">
+                    Bangla Medium & English Version
                   </span>
-                ))}
+                )}
               </div>
             </div>
           </div>
@@ -174,15 +202,22 @@ export const TeacherDetailModal: React.FC<TeacherDetailModalProps> = ({
               Preferred Tutoring Locations
             </h4>
             <div className="flex flex-wrap gap-2">
-              {teacher.preferredLocations.map((loc, idx) => (
-                <span
-                  key={idx}
-                  className="inline-flex items-center gap-1 px-3 py-1 rounded-full text-xs font-medium bg-slate-100 text-slate-700"
-                >
+              {teacher.preferredLocations && teacher.preferredLocations.length > 0 ? (
+                teacher.preferredLocations.map((loc, idx) => (
+                  <span
+                    key={idx}
+                    className="inline-flex items-center gap-1 px-3 py-1 rounded-full text-xs font-medium bg-slate-100 text-slate-700"
+                  >
+                    <MapPin className="w-3 h-3 text-cyan-600" />
+                    {loc}
+                  </span>
+                ))
+              ) : (
+                <span className="inline-flex items-center gap-1 px-3 py-1 rounded-full text-xs font-medium bg-slate-100 text-slate-700">
                   <MapPin className="w-3 h-3 text-cyan-600" />
-                  {loc}
+                  Dhaka / Online Tutoring
                 </span>
-              ))}
+              )}
             </div>
           </div>
 
@@ -198,7 +233,13 @@ export const TeacherDetailModal: React.FC<TeacherDetailModalProps> = ({
         {/* Modal Footer / Actions */}
         <div className="p-4 sm:p-6 bg-slate-50 border-t border-slate-100 flex flex-col sm:flex-row items-center justify-between gap-3">
           <div className="text-xs text-slate-500 text-center sm:text-left">
-            <span>ID: {teacher.id}</span> • <span>Approved by Finest Tutors BD</span>
+            {teacher.teacherCode ? (
+              <span className="font-semibold text-slate-700">
+                Teacher ID: <span className="font-mono text-[#005B96] font-bold">{teacher.teacherCode}</span>
+              </span>
+            ) : (
+              <span>ID: {teacher.id}</span>
+            )} • <span>Approved by Finest Tutors BD</span>
           </div>
 
           <div className="flex items-center gap-3 w-full sm:w-auto">

@@ -2,6 +2,7 @@ export type Gender = 'Male' | 'Female' | 'Other';
 
 export interface TeacherProfile {
   id: string;
+  teacherCode?: string;
   fullName: string;
   gender: Gender;
   university: string;

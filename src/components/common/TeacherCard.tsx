@@ -36,6 +36,10 @@ export const TeacherCard: React.FC<TeacherCardProps> = ({
                 alt={teacher.fullName}
                 className="w-16 h-16 sm:w-18 sm:h-18 rounded-2xl object-cover ring-2 ring-slate-100 group-hover:ring-cyan-400/50 transition-all duration-300 bg-slate-100"
                 loading="lazy"
+                onError={(e) => {
+                  (e.target as HTMLImageElement).onerror = null;
+                  (e.target as HTMLImageElement).src = `https://ui-avatars.com/api/?name=${encodeURIComponent(teacher.fullName)}&background=005B96&color=fff&size=128`;
+                }}
               />
             ) : (
               <div className="w-16 h-16 sm:w-18 sm:h-18 rounded-2xl bg-cyan-100/80 text-[#005B96] flex items-center justify-center font-bold text-xl ring-2 ring-slate-100 group-hover:ring-cyan-400/50 transition-all duration-300">
@@ -62,6 +66,13 @@ export const TeacherCard: React.FC<TeacherCardProps> = ({
               )}
             </div>
 
+            {teacher.teacherCode && (
+              <div className="inline-flex items-center gap-1.5 px-2 py-0.5 rounded-md bg-blue-50 text-[#005B96] border border-blue-200/70 text-xs w-fit">
+                <span className="text-[10px] font-semibold text-slate-500 uppercase tracking-wider">Teacher ID:</span>
+                <span className="font-mono font-bold">{teacher.teacherCode}</span>
+              </div>
+            )}
+
             <p className="text-xs sm:text-sm font-semibold text-slate-700 flex items-start gap-1 line-clamp-1">
               <GraduationCap className="w-4 h-4 text-cyan-600 shrink-0 mt-0.5" />
               <span className="truncate" title={teacher.university}>
@@ -79,7 +90,7 @@ export const TeacherCard: React.FC<TeacherCardProps> = ({
 
         {/* Bio / Intro preview */}
         <p className="text-xs sm:text-sm text-slate-600 line-clamp-2 leading-relaxed italic">
-          "{teacher.bio}"
+          "{teacher.bio || `Dedicated and verified tutor from ${teacher.university} specializing in ${teacher.department}.`}"
         </p>
 
         {/* Subjects Badges */}
@@ -92,15 +103,21 @@ export const TeacherCard: React.FC<TeacherCardProps> = ({
             <span className="text-[11px] text-slate-400">{teacher.gender}</span>
           </div>
           <div className="flex flex-wrap gap-1.5">
-            {teacher.subjects.slice(0, 3).map((sub, i) => (
-              <span
-                key={i}
-                className="px-2 py-0.5 rounded-md text-xs font-medium bg-cyan-50 text-cyan-800 border border-cyan-100/80"
-              >
-                {sub}
+            {teacher.subjects && teacher.subjects.length > 0 ? (
+              teacher.subjects.slice(0, 3).map((sub, i) => (
+                <span
+                  key={i}
+                  className="px-2 py-0.5 rounded-md text-xs font-medium bg-cyan-50 text-cyan-800 border border-cyan-100/80"
+                >
+                  {sub}
+                </span>
+              ))
+            ) : (
+              <span className="px-2 py-0.5 rounded-md text-xs font-medium bg-cyan-50 text-cyan-800 border border-cyan-100/80">
+                {teacher.department || 'General Tuition'}
               </span>
-            ))}
-            {teacher.subjects.length > 3 && (
+            )}
+            {teacher.subjects && teacher.subjects.length > 3 && (
               <span className="px-2 py-0.5 rounded-md text-xs font-medium bg-slate-100 text-slate-600">
                 +{teacher.subjects.length - 3} more
               </span>
@@ -112,8 +129,9 @@ export const TeacherCard: React.FC<TeacherCardProps> = ({
         <div className="flex items-center gap-1.5 text-xs text-slate-500 pt-1">
           <MapPin className="w-3.5 h-3.5 text-slate-400 shrink-0" />
           <span className="truncate">
-            {teacher.preferredLocations.slice(0, 3).join(', ')}
-            {teacher.preferredLocations.length > 3 ? '...' : ''}
+            {teacher.preferredLocations && teacher.preferredLocations.length > 0
+              ? teacher.preferredLocations.slice(0, 3).join(', ') + (teacher.preferredLocations.length > 3 ? '...' : '')
+              : 'Dhaka / Online'}
           </span>
         </div>
       </div>

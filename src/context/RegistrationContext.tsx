@@ -31,6 +31,7 @@ interface RegistrationContextType {
   approvedTeachers: TeacherProfile[];
   isSupabaseConnected: boolean;
   isLoadingTeachers: boolean;
+  refreshApprovedTeachers: () => Promise<void>;
   submitTeacherRegistration: (data: TeacherRegistrationFormData) => Promise<RegistrationSubmissionResult>;
   recentSubmission: RecentSubmissionSummary | null;
   clearRecentSubmission: () => void;
@@ -43,31 +44,26 @@ export const RegistrationProvider: React.FC<{ children: React.ReactNode }> = ({ 
   const [isLoadingTeachers, setIsLoadingTeachers] = useState(false);
   const [recentSubmission, setRecentSubmission] = useState<RecentSubmissionSummary | null>(null);
 
-  // Attempt to load approved teachers from Supabase if configured
-  useEffect(() => {
-    let isMounted = true;
-
-    async function loadTeachers() {
-      if (!isSupabaseConfigured) return;
-      setIsLoadingTeachers(true);
-      try {
-        const liveTeachers = await fetchApprovedTeachersFromSupabase();
-        if (isMounted && liveTeachers && liveTeachers.length > 0) {
-          setApprovedTeachers(liveTeachers);
-        }
-      } catch (err) {
-        console.warn('Could not load approved teachers from Supabase; using demo records:', err);
-      } finally {
-        if (isMounted) setIsLoadingTeachers(false);
+  // Refresh approved teachers from Supabase
+  const refreshApprovedTeachers = React.useCallback(async () => {
+    if (!isSupabaseConfigured) return;
+    setIsLoadingTeachers(true);
+    try {
+      const liveTeachers = await fetchApprovedTeachersFromSupabase();
+      if (liveTeachers && liveTeachers.length > 0) {
+        setApprovedTeachers(liveTeachers);
       }
+    } catch (err) {
+      console.warn('Could not load approved teachers from Supabase:', err);
+    } finally {
+      setIsLoadingTeachers(false);
     }
-
-    loadTeachers();
-
-    return () => {
-      isMounted = false;
-    };
   }, []);
+
+  // Initial load on mount
+  useEffect(() => {
+    refreshApprovedTeachers();
+  }, [refreshApprovedTeachers]);
 
   /**
    * Submits teacher registration to the Supabase Edge Function `submit-teacher-registration`.
@@ -153,6 +149,7 @@ export const RegistrationProvider: React.FC<{ children: React.ReactNode }> = ({ 
         approvedTeachers,
         isSupabaseConnected: isSupabaseConfigured,
         isLoadingTeachers,
+        refreshApprovedTeachers,
         submitTeacherRegistration,
         recentSubmission,
         clearRecentSubmission,

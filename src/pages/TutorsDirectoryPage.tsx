@@ -34,11 +34,12 @@ export const TutorsDirectoryPage: React.FC = () => {
       if (searchQuery.trim()) {
         const query = searchQuery.toLowerCase();
         const matchesName = teacher.fullName.toLowerCase().includes(query);
+        const matchesCode = teacher.teacherCode ? teacher.teacherCode.toLowerCase().includes(query) : false;
         const matchesSubject = teacher.subjects.some((s) => s.toLowerCase().includes(query));
         const matchesUni = teacher.university.toLowerCase().includes(query);
         const matchesDept = teacher.department.toLowerCase().includes(query);
         const matchesLoc = teacher.preferredLocations.some((l) => l.toLowerCase().includes(query));
-        if (!matchesName && !matchesSubject && !matchesUni && !matchesDept && !matchesLoc) {
+        if (!matchesName && !matchesCode && !matchesSubject && !matchesUni && !matchesDept && !matchesLoc) {
           return false;
         }
       }
@@ -132,7 +133,7 @@ export const TutorsDirectoryPage: React.FC = () => {
                 type="text"
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
-                placeholder="Search tutor, subject (e.g. Physics, Math)..."
+                placeholder="Search by Teacher ID, tutor name, subject..."
                 className="w-full pl-10 pr-4 py-2.5 rounded-xl border border-slate-300 text-xs sm:text-sm focus:border-[#0072EA] focus:outline-none"
               />
             </div>
@@ -145,6 +146,7 @@ export const TutorsDirectoryPage: React.FC = () => {
                 className="w-full px-3 py-2.5 rounded-xl border border-slate-300 text-xs sm:text-sm focus:border-[#0072EA] focus:outline-none bg-white"
               >
                 <option value="All">All Universities</option>
+                <option value="Dhaka College">Dhaka College</option>
                 <option value="BUET">BUET</option>
                 <option value="Dhaka">University of Dhaka (DU)</option>
                 <option value="Medical">Dhaka Medical College</option>

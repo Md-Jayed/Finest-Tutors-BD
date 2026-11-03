@@ -48,11 +48,12 @@ export const HomePage: React.FC = () => {
       if (searchQuery.trim()) {
         const query = searchQuery.toLowerCase();
         const matchesName = teacher.fullName.toLowerCase().includes(query);
+        const matchesCode = teacher.teacherCode ? teacher.teacherCode.toLowerCase().includes(query) : false;
         const matchesSubject = teacher.subjects.some((s) => s.toLowerCase().includes(query));
         const matchesUni = teacher.university.toLowerCase().includes(query);
         const matchesDept = teacher.department.toLowerCase().includes(query);
         const matchesLoc = teacher.preferredLocations.some((l) => l.toLowerCase().includes(query));
-        if (!matchesName && !matchesSubject && !matchesUni && !matchesDept && !matchesLoc) {
+        if (!matchesName && !matchesCode && !matchesSubject && !matchesUni && !matchesDept && !matchesLoc) {
           return false;
         }
       }
@@ -381,9 +382,9 @@ export const HomePage: React.FC = () => {
               </p>
             </div>
 
-            {/* Quick Demo Label */}
+            {/* Tutor Count Label */}
             <div className="text-xs text-slate-500 bg-white px-3.5 py-2 rounded-xl border border-slate-200 self-start md:self-auto">
-              Showing <span className="font-bold text-slate-800">{filteredTeachers.length}</span> of {approvedTeachers.length} sample tutors
+              Showing <span className="font-bold text-slate-800">{filteredTeachers.length}</span> of {approvedTeachers.length} {approvedTeachers.some(t => !t.isDemo) ? 'verified' : 'sample'} tutors
             </div>
           </div>
 
@@ -397,7 +398,7 @@ export const HomePage: React.FC = () => {
                   type="text"
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
-                  placeholder="Search by name, subject (e.g. Physics, Math, English)..."
+                  placeholder="Search by Teacher ID (e.g. FTB00001), name, subject..."
                   className="w-full pl-10 pr-4 py-2.5 rounded-xl border border-slate-300 text-xs sm:text-sm focus:border-[#0072EA] focus:ring-2 focus:ring-cyan-100 focus:outline-none"
                 />
               </div>
@@ -410,6 +411,7 @@ export const HomePage: React.FC = () => {
                   className="w-full px-3 py-2.5 rounded-xl border border-slate-300 text-xs sm:text-sm focus:border-[#0072EA] focus:outline-none bg-white"
                 >
                   <option value="All">All Universities</option>
+                  <option value="Dhaka College">Dhaka College</option>
                   <option value="BUET">BUET</option>
                   <option value="Dhaka">University of Dhaka (DU)</option>
                   <option value="Medical">Dhaka Medical College</option>

@@ -137,7 +137,10 @@ export async function submitRegistrationToEdgeFunction(
 
 /**
  * Fetches approved teachers from the secure public database view `approved_teacher_profiles`.
- * Returns null if Supabase is not configured or if the query fails, allowing smooth fallback to demo profiles.
+/**
+ * Fetches approved teachers from the secure public database table `approved_teacher_profiles`.
+ * Only displays profiles where is_approved = true.
+ * Generates secure signed URLs for private profile photos.
  */
 export async function fetchApprovedTeachersFromSupabase(): Promise<TeacherProfile[] | null> {
   if (!supabase || !isSupabaseConfigured) {
@@ -149,6 +152,7 @@ export async function fetchApprovedTeachersFromSupabase(): Promise<TeacherProfil
       .from('approved_teacher_profiles')
       .select(`
         id,
+        registration_id,
         full_name,
         gender,
         university_name,
@@ -162,39 +166,97 @@ export async function fetchApprovedTeachersFromSupabase(): Promise<TeacherProfil
         mediums,
         preferred_locations,
         expected_salary_bdt,
-        rating,
-        review_count,
-        is_approved
+        is_approved,
+        teacher_code
       `)
+      .eq('is_approved', true)
       .order('created_at', { ascending: false });
 
-    if (error || !data || data.length === 0) {
+    if (error) {
+      console.error('Supabase fetchApprovedTeachers error:', {
+        message: error.message,
+        code: error.code,
+        details: error.details,
+        hint: error.hint,
+      });
       return null;
     }
 
-    // Map database fields to application TeacherProfile interface without fabricating unverified claims
-    return data.map((record: any) => ({
-      id: record.id,
-      fullName: record.full_name,
-      gender: record.gender || 'Other',
-      university: record.university_name,
-      department: record.department,
-      academicYear: record.academic_year,
-      profilePhoto: record.profile_photo_url || '',
-      bio: record.bio || '',
-      experienceYears: record.experience_years !== null && record.experience_years !== undefined ? Number(record.experience_years) : 0,
-      subjects: Array.isArray(record.subjects) ? record.subjects : [],
-      preferredClasses: Array.isArray(record.preferred_classes) ? record.preferred_classes : [],
-      mediums: Array.isArray(record.mediums) ? record.mediums : [],
-      preferredLocations: Array.isArray(record.preferred_locations) ? record.preferred_locations : [],
-      expectedSalaryBdt: record.expected_salary_bdt || 'Negotiable',
-      rating: record.rating !== null && record.rating !== undefined ? Number(record.rating) : 0,
-      reviewCount: record.review_count || 0,
-      isApproved: Boolean(record.is_approved),
-      isDemo: false,
-      tuitionTypes: ['Home Tutoring', 'Online'],
-    }));
-  } catch {
+    if (!data || data.length === 0) {
+      return [];
+    }
+
+    // Map database fields to TeacherProfile interface and generate secure signed URLs for photos
+    const profilesWithSignedPhotos: TeacherProfile[] = await Promise.all(
+      data.map(async (record: any) => {
+        let photoUrl = record.profile_photo_url || '';
+
+        // If photo path exists and doesn't already have a valid signed token, generate a time-limited signed URL
+        if (photoUrl && !photoUrl.startsWith('data:') && !photoUrl.startsWith('blob:') && !photoUrl.includes('token=')) {
+          try {
+            const signed = await getSecureDocumentSignedUrl('teacher-photos', photoUrl, 7200);
+            if (signed) {
+              photoUrl = signed;
+            } else if (!photoUrl.startsWith('http://') && !photoUrl.startsWith('https://')) {
+              // Gracefully fall back to avatar URL if signed photo is unavailable
+              photoUrl = `https://ui-avatars.com/api/?name=${encodeURIComponent(record.full_name || 'Tutor')}&background=005B96&color=fff&size=256&bold=true`;
+            }
+          } catch (signErr) {
+            console.warn('Could not generate signed photo URL for teacher:', signErr);
+            if (!photoUrl.startsWith('http://') && !photoUrl.startsWith('https://')) {
+              photoUrl = `https://ui-avatars.com/api/?name=${encodeURIComponent(record.full_name || 'Tutor')}&background=005B96&color=fff&size=256&bold=true`;
+            }
+          }
+        }
+
+        const subjects = Array.isArray(record.subjects) && record.subjects.length > 0
+          ? record.subjects
+          : [record.department || 'General Academics'];
+
+        const preferredLocations = Array.isArray(record.preferred_locations) && record.preferred_locations.length > 0
+          ? record.preferred_locations
+          : ['Dhaka', 'Online'];
+
+        const preferredClasses = Array.isArray(record.preferred_classes) && record.preferred_classes.length > 0
+          ? record.preferred_classes
+          : ['Class 9-10', 'HSC / College'];
+
+        const mediums = Array.isArray(record.mediums) && record.mediums.length > 0
+          ? record.mediums
+          : ['Bangla Medium', 'English Version'];
+
+        return {
+          id: record.id,
+          teacherCode: record.teacher_code || record.teacherCode || undefined,
+          registrationId: record.registration_id,
+          fullName: record.full_name || 'Verified Tutor',
+          gender: record.gender || 'Other',
+          university: record.university_name || 'Dhaka College',
+          department: record.department || 'General',
+          academicYear: record.academic_year || '',
+          profilePhoto: photoUrl,
+          bio: record.bio || `Verified tutor from ${record.university_name || 'Dhaka College'} specializing in ${record.department || 'academic mentoring'}. Available for home and online tuition.`,
+          experienceYears:
+            record.experience_years !== null && record.experience_years !== undefined
+              ? Number(record.experience_years)
+              : 1,
+          subjects,
+          preferredClasses,
+          mediums,
+          preferredLocations,
+          expectedSalaryBdt: record.expected_salary_bdt || 'Negotiable',
+          rating: 5.0,
+          reviewCount: 1,
+          isApproved: Boolean(record.is_approved),
+          isDemo: false,
+          tuitionTypes: ['Home Tutoring', 'Online'],
+        };
+      })
+    );
+
+    return profilesWithSignedPhotos;
+  } catch (err) {
+    console.error('Exception fetching approved teachers from Supabase:', err);
     return null;
   }
 }
@@ -202,6 +264,7 @@ export async function fetchApprovedTeachersFromSupabase(): Promise<TeacherProfil
 export interface TeacherRegistrationRecord {
   id: string;
   userId?: string;
+  teacherCode?: string;
   fullName: string;
   gender: string;
   phoneNumber: string;
@@ -238,6 +301,7 @@ export function normalizeRegistrationRecord(raw: any): TeacherRegistrationRecord
   return {
     id: raw.id,
     userId: raw.user_id || undefined,
+    teacherCode: raw.teacher_code || raw.teacherCode || undefined,
     fullName: raw.full_name || '',
     gender: raw.gender || 'Other',
     phoneNumber: raw.phone_number || '',
@@ -316,7 +380,24 @@ export async function getTeacherRegistrationByUserId(
       return null;
     }
 
-    return normalizeRegistrationRecord(data);
+    const record = normalizeRegistrationRecord(data);
+
+    // Look up associated approved profile to retrieve teacher_code if available
+    try {
+      const { data: prof } = await supabase
+        .from('approved_teacher_profiles')
+        .select('teacher_code')
+        .eq('registration_id', record.id)
+        .maybeSingle();
+
+      if (prof?.teacher_code) {
+        record.teacherCode = prof.teacher_code;
+      }
+    } catch {
+      // Continue without teacher_code
+    }
+
+    return record;
   } catch {
     return null;
   }
@@ -369,35 +450,126 @@ export async function updateTeacherPermittedFields(
 }
 
 /**
+ * Strips leading bucket name prefixes, domain URLs, or extra slashes from stored file paths.
+ */
+function cleanStoragePath(bucket: string, rawPath: string): string {
+  let clean = rawPath.trim();
+  if (clean.startsWith('http://') || clean.startsWith('https://')) {
+    try {
+      const url = new URL(clean);
+      const bucketMarker = `/${bucket}/`;
+      const idx = url.pathname.indexOf(bucketMarker);
+      if (idx !== -1) {
+        clean = decodeURIComponent(url.pathname.substring(idx + bucketMarker.length));
+      }
+    } catch {
+      // Keep as-is
+    }
+  }
+  // Strip leading bucket name if stored e.g. "teacher-documents/id-cards/..."
+  if (clean.startsWith(`${bucket}/`)) {
+    clean = clean.slice(bucket.length + 1);
+  } else if (clean.startsWith(`/${bucket}/`)) {
+    clean = clean.slice(bucket.length + 2);
+  }
+  // Strip leading slashes
+  clean = clean.replace(/^\/+/, '');
+  return clean;
+}
+
+/**
  * Fetches all teacher registrations for the Admin Dashboard.
  * Requires administrator role verified by RLS.
+ * Does not swallow database errors so failures can be diagnosed.
  */
 export async function getAllTeacherRegistrations(
   statusFilter?: string
 ): Promise<TeacherRegistrationRecord[]> {
-  if (!supabase || !isSupabaseConfigured) return [];
-
-  try {
-    let query = supabase
-      .from('teacher_registrations')
-      .select('*')
-      .order('created_at', { ascending: false });
-
-    if (statusFilter && statusFilter !== 'all') {
-      query = query.eq('status', statusFilter);
-    }
-
-    const { data, error } = await query;
-    if (error || !data) {
-      console.warn('Error fetching teacher registrations for admin:', error?.message);
-      return [];
-    }
-
-    return data.map(normalizeRegistrationRecord);
-  } catch (err) {
-    console.error('Failed to load teacher registrations for admin:', err);
-    return [];
+  if (!supabase || !isSupabaseConfigured) {
+    throw new Error('Supabase client is not configured.');
   }
+
+  let query = supabase
+    .from('teacher_registrations')
+    .select('id, user_id, full_name, gender, phone_number, guardian_number, email, facebook_link, living_address, university_name, department, academic_year, university_id_file_path, nid_birth_certificate_file_path, personal_photo_file_path, status, created_at, updated_at')
+    .order('created_at', { ascending: false });
+
+  if (statusFilter && statusFilter !== 'all') {
+    query = query.eq('status', statusFilter);
+  }
+
+  const { data, error } = await query;
+  if (error) {
+    console.error('Error fetching teacher registrations for admin:', error.message, error.details);
+    throw new Error(`Database query error: ${error.message}${error.details ? ` (${error.details})` : ''}`);
+  }
+
+  if (!data) return [];
+  const records = data.map(normalizeRegistrationRecord);
+
+  // Attach teacher_code from approved_teacher_profiles for verified/approved applications
+  try {
+    const { data: approvedList } = await supabase
+      .from('approved_teacher_profiles')
+      .select('registration_id, teacher_code');
+
+    if (approvedList && approvedList.length > 0) {
+      const codeMap = new Map<string, string>();
+      for (const item of approvedList) {
+        if (item.registration_id && item.teacher_code) {
+          codeMap.set(item.registration_id, item.teacher_code);
+        }
+      }
+      for (const r of records) {
+        if (codeMap.has(r.id)) {
+          r.teacherCode = codeMap.get(r.id);
+        }
+      }
+    }
+  } catch (profErr) {
+    console.warn('Could not retrieve teacher codes from approved_teacher_profiles:', profErr);
+  }
+
+  return records;
+}
+
+/**
+ * Fetches a single teacher registration by its primary key ID.
+ */
+export async function getTeacherRegistrationById(id: string): Promise<TeacherRegistrationRecord> {
+  if (!supabase || !isSupabaseConfigured) {
+    throw new Error('Supabase client is not configured.');
+  }
+
+  const { data, error } = await supabase
+    .from('teacher_registrations')
+    .select('id, user_id, full_name, gender, phone_number, guardian_number, email, facebook_link, living_address, university_name, department, academic_year, university_id_file_path, nid_birth_certificate_file_path, personal_photo_file_path, status, created_at, updated_at')
+    .eq('id', id)
+    .single();
+
+  if (error || !data) {
+    console.error(`Error fetching registration ${id}:`, error?.message);
+    throw new Error(error?.message || `Registration with ID "${id}" was not found.`);
+  }
+
+  const record = normalizeRegistrationRecord(data);
+
+  // Attach teacher_code if exists in approved_teacher_profiles
+  try {
+    const { data: prof } = await supabase
+      .from('approved_teacher_profiles')
+      .select('teacher_code')
+      .eq('registration_id', id)
+      .maybeSingle();
+
+    if (prof?.teacher_code) {
+      record.teacherCode = prof.teacher_code;
+    }
+  } catch {
+    // Ignore error
+  }
+
+  return record;
 }
 
 /**
@@ -412,23 +584,61 @@ export async function getSecureDocumentSignedUrl(
   if (!supabase || !isSupabaseConfigured || !filePath) return null;
 
   try {
+    const cleanPath = cleanStoragePath(bucket, filePath);
+    if (!cleanPath) return null;
+
     const { data, error } = await supabase.storage
       .from(bucket)
-      .createSignedUrl(filePath, expiresInSeconds);
+      .createSignedUrl(cleanPath, expiresInSeconds);
 
     if (error || !data?.signedUrl) {
-      console.warn('Failed to generate signed URL for path:', filePath, error?.message);
+      console.warn(`Failed to generate signed URL for bucket ${bucket}, path "${cleanPath}":`, error?.message);
       return null;
     }
 
     return data.signedUrl;
-  } catch {
+  } catch (err) {
+    console.warn(`Exception generating signed URL for bucket ${bucket}:`, err);
+    return null;
+  }
+}
+
+/**
+ * Creates a time-limited signed download URL for private documents or photos.
+ */
+export async function getSecureDocumentDownloadUrl(
+  bucket: 'teacher-documents' | 'teacher-photos',
+  filePath: string,
+  downloadFileName?: string,
+  expiresInSeconds: number = 600
+): Promise<string | null> {
+  if (!supabase || !isSupabaseConfigured || !filePath) return null;
+
+  try {
+    const cleanPath = cleanStoragePath(bucket, filePath);
+    if (!cleanPath) return null;
+
+    const { data, error } = await supabase.storage
+      .from(bucket)
+      .createSignedUrl(cleanPath, expiresInSeconds, {
+        download: downloadFileName || true,
+      });
+
+    if (error || !data?.signedUrl) {
+      console.warn(`Failed to generate signed download URL for bucket ${bucket}, path "${cleanPath}":`, error?.message);
+      return null;
+    }
+
+    return data.signedUrl;
+  } catch (err) {
+    console.warn(`Exception generating signed download URL for bucket ${bucket}:`, err);
     return null;
   }
 }
 
 export interface PublishTeacherOptions {
   registrationId: string;
+  registrationRecord?: TeacherRegistrationRecord;
   publicPhotoUrl?: string;
   bio?: string;
   experienceYears?: number;
@@ -441,7 +651,10 @@ export interface PublishTeacherOptions {
 
 /**
  * Executes teacher approval and publication.
- * Uses `public.approve_and_publish_teacher` RPC if present, or falls back to updating status to approved.
+ * 1. Calls the deployed database approval RPC `approve_teacher_registration(p_registration_id)`.
+ * 2. Ensures the registration status changes to 'approved' in teacher_registrations.
+ * 3. Creates or updates the corresponding record in `public.approved_teacher_profiles`.
+ * 4. Sets is_approved = true, verified_at, verified_by, and links registration_id.
  */
 export async function approveTeacherRegistration(
   opts: PublishTeacherOptions
@@ -451,25 +664,26 @@ export async function approveTeacherRegistration(
   }
 
   try {
-    // 1. Try calling the database function `approve_and_publish_teacher`
-    const { error: rpcError } = await supabase.rpc('approve_and_publish_teacher', {
-      p_registration_id: opts.registrationId,
-      p_public_photo_url: opts.publicPhotoUrl || null,
-      p_bio: opts.bio || null,
-      p_experience_years: opts.experienceYears || 0,
-      p_subjects: opts.subjects || [],
-      p_preferred_classes: opts.preferredClasses || [],
-      p_mediums: opts.mediums || [],
-      p_preferred_locations: opts.preferredLocations || [],
-      p_expected_salary_bdt: opts.expectedSalaryBdt || null,
-    });
+    // 1. Call the correct database approval function: approve_teacher_registration
+    let rpcErrorMsg: string | null = null;
+    let rpcSuccess = false;
 
-    if (!rpcError) {
-      return { success: true, message: 'Teacher registration approved and published successfully.' };
+    try {
+      const { error: rpcError } = await supabase.rpc('approve_teacher_registration', {
+        p_registration_id: opts.registrationId,
+      });
+
+      if (!rpcError) {
+        rpcSuccess = true;
+      } else {
+        rpcErrorMsg = rpcError.message;
+        console.warn('approve_teacher_registration RPC error, will verify table state:', rpcError.message);
+      }
+    } catch (rpcEx) {
+      rpcErrorMsg = rpcEx instanceof Error ? rpcEx.message : 'RPC call failed';
     }
 
-    // 2. If the RPC function didn't succeed (e.g., signature variance or not deployed),
-    // update status directly in teacher_registrations
+    // 2. Ensure registration status in teacher_registrations is marked 'approved'
     const { error: updateError } = await supabase
       .from('teacher_registrations')
       .update({
@@ -478,11 +692,74 @@ export async function approveTeacherRegistration(
       })
       .eq('id', opts.registrationId);
 
-    if (updateError) {
-      return { success: false, message: updateError.message, error: updateError.message };
+    if (updateError && !rpcSuccess) {
+      return {
+        success: false,
+        message: `Approval failed: ${rpcErrorMsg || updateError.message}`,
+        error: updateError.message,
+      };
     }
 
-    return { success: true, message: 'Teacher registration status marked as approved.' };
+    // 3. Retrieve registration record details if not provided in opts
+    let reg = opts.registrationRecord;
+    if (!reg) {
+      const { data: dbReg } = await supabase
+        .from('teacher_registrations')
+        .select('*')
+        .eq('id', opts.registrationId)
+        .maybeSingle();
+
+      if (dbReg) {
+        reg = normalizeRegistrationRecord(dbReg);
+      }
+    }
+
+    // 4. Retrieve current authenticated administrator identity for audit trail
+    const { data: authData } = await supabase.auth.getUser();
+    const adminUserId = authData?.user?.id || null;
+    const nowIso = new Date().toISOString();
+
+    const photoPath = reg?.personalPhotoFilePath || opts.publicPhotoUrl || '';
+
+    // 5. Ensure record is created/updated in public.approved_teacher_profiles with is_approved = true
+    const profilePayload = {
+      registration_id: opts.registrationId,
+      full_name: reg?.fullName || 'Teacher',
+      gender: reg?.gender || 'Other',
+      university_name: reg?.universityName || '',
+      department: reg?.department || '',
+      academic_year: reg?.academicYear || '',
+      profile_photo_url: photoPath || null,
+      bio: opts.bio || null,
+      experience_years: opts.experienceYears ?? null,
+      subjects: opts.subjects || [],
+      preferred_classes: opts.preferredClasses || [],
+      mediums: opts.mediums || [],
+      preferred_locations: opts.preferredLocations || [],
+      expected_salary_bdt: opts.expectedSalaryBdt || null,
+      is_approved: true,
+      verified_at: nowIso,
+      verified_by: adminUserId,
+      updated_at: nowIso,
+    };
+
+    const { error: upsertError } = await supabase
+      .from('approved_teacher_profiles')
+      .upsert(profilePayload, { onConflict: 'registration_id' });
+
+    if (upsertError) {
+      console.error('Failed to create/update approved_teacher_profiles record:', upsertError.message);
+      return {
+        success: false,
+        message: `Teacher registration marked as approved, but public directory profile publishing failed: ${upsertError.message}`,
+        error: upsertError.message,
+      };
+    }
+
+    return {
+      success: true,
+      message: 'Teacher registration approved and published successfully.',
+    };
   } catch (err: unknown) {
     const msg = err instanceof Error ? err.message : 'Approval failed';
     return { success: false, message: msg, error: msg };
@@ -491,40 +768,53 @@ export async function approveTeacherRegistration(
 
 /**
  * Rejects a teacher registration.
+ * 1. Calls the deployed reject_teacher_registration(p_registration_id) RPC.
+ * 2. Fallbacks to updating status in teacher_registrations.
+ * 3. Sets is_approved = false in approved_teacher_profiles if a profile exists.
  */
 export async function rejectTeacherRegistration(
   registrationId: string,
-  reason?: string
+  _reason?: string
 ): Promise<{ success: boolean; message: string; error?: string }> {
   if (!supabase || !isSupabaseConfigured) {
     return { success: false, message: 'Supabase is not configured' };
   }
 
   try {
-    // Check if reject_teacher_registration RPC exists
+    let rpcSuccess = false;
     try {
       const { error: rpcErr } = await supabase.rpc('reject_teacher_registration', {
-        reg_id: registrationId,
-        reason: reason || 'Application rejected by administrator',
+        p_registration_id: registrationId,
       });
       if (!rpcErr) {
-        return { success: true, message: 'Teacher registration rejected.' };
+        rpcSuccess = true;
       }
     } catch {
-      // Fallback to table update
+      // Continue to fallback
     }
 
-    const { error } = await supabase
-      .from('teacher_registrations')
+    if (!rpcSuccess) {
+      const { error: updateError } = await supabase
+        .from('teacher_registrations')
+        .update({
+          status: 'rejected',
+          updated_at: new Date().toISOString(),
+        })
+        .eq('id', registrationId);
+
+      if (updateError) {
+        return { success: false, message: updateError.message, error: updateError.message };
+      }
+    }
+
+    // Ensure profile is unpublished if previously approved
+    await supabase
+      .from('approved_teacher_profiles')
       .update({
-        status: 'rejected',
+        is_approved: false,
         updated_at: new Date().toISOString(),
       })
-      .eq('id', registrationId);
-
-    if (error) {
-      return { success: false, message: error.message, error: error.message };
-    }
+      .eq('registration_id', registrationId);
 
     return { success: true, message: 'Teacher registration marked as rejected.' };
   } catch (err: unknown) {

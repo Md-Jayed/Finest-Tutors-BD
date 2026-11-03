@@ -10,6 +10,7 @@ import { TeacherProfile } from '../types';
 export const MOCK_APPROVED_TEACHERS: TeacherProfile[] = [
   {
     id: 't-101',
+    teacherCode: 'FTB00101',
     fullName: 'Tanvir Ahmed',
     gender: 'Male',
     university: 'BUET (Bangladesh University of Engineering and Technology)',
@@ -31,6 +32,7 @@ export const MOCK_APPROVED_TEACHERS: TeacherProfile[] = [
   },
   {
     id: 't-102',
+    teacherCode: 'FTB00102',
     fullName: 'Nusrat Jahan',
     gender: 'Female',
     university: 'University of Dhaka (DU)',
@@ -52,6 +54,7 @@ export const MOCK_APPROVED_TEACHERS: TeacherProfile[] = [
   },
   {
     id: 't-103',
+    teacherCode: 'FTB00103',
     fullName: 'Shadman Shakib',
     gender: 'Male',
     university: 'Dhaka Medical College (DMC)',
@@ -73,6 +76,7 @@ export const MOCK_APPROVED_TEACHERS: TeacherProfile[] = [
   },
   {
     id: 't-104',
+    teacherCode: 'FTB00104',
     fullName: 'Farhana Akter Rimi',
     gender: 'Female',
     university: 'BRAC University',
@@ -94,6 +98,7 @@ export const MOCK_APPROVED_TEACHERS: TeacherProfile[] = [
   },
   {
     id: 't-105',
+    teacherCode: 'FTB00105',
     fullName: 'Abrar Zahin',
     gender: 'Male',
     university: 'IBA, University of Dhaka',
@@ -115,6 +120,7 @@ export const MOCK_APPROVED_TEACHERS: TeacherProfile[] = [
   },
   {
     id: 't-106',
+    teacherCode: 'FTB00106',
     fullName: 'Mahira Chowdhury',
     gender: 'Female',
     university: 'North South University (NSU)',
@@ -136,6 +142,7 @@ export const MOCK_APPROVED_TEACHERS: TeacherProfile[] = [
   },
   {
     id: 't-107',
+    teacherCode: 'FTB00107',
     fullName: 'Kazi Rayhanul Islam',
     gender: 'Male',
     university: 'Jahangirnagar University (JU)',
@@ -157,6 +164,7 @@ export const MOCK_APPROVED_TEACHERS: TeacherProfile[] = [
   },
   {
     id: 't-108',
+    teacherCode: 'FTB00108',
     fullName: 'Sumaiya Tabassum',
     gender: 'Female',
     university: 'Shahjalal University of Science and Technology (SUST)',
