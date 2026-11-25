@@ -141,7 +141,7 @@ export const Footer: React.FC = () => {
                     <img src="/assets/aistudio/bkash_4cec4bc3.png" alt="bKash" className="h-4 w-auto bg-white px-1 py-0.5 rounded object-contain" />
                     <img src="/assets/aistudio/nagad_fa6c4b2e.png" alt="Nagad" className="h-4 w-auto bg-white px-1 py-0.5 rounded object-contain" />
                     <img src="/assets/aistudio/rocket_13ecbfe6.png" alt="Rocket" className="h-4 w-auto bg-white px-1 py-0.5 rounded object-contain" />
-                    <span className="font-mono text-cyan-300 text-[11px] ml-auto font-bold">01356-542184</span>
+                    <span className="font-mono text-cyan-300 text-[11px] ml-auto font-bold">01315-980669</span>
                   </div>
                 </Link>
               </li>

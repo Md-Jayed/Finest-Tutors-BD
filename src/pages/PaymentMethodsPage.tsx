@@ -65,7 +65,7 @@ export const PaymentMethodsPage: React.FC = () => {
               </div>
               <h4 className="font-bold text-slate-900 text-sm">Enter Official Number</h4>
               <p className="text-xs text-slate-600 leading-relaxed">
-                Input recipient number <strong className="text-slate-900 font-mono">01356-542184</strong> (or 01356542184) and your specified tuition/service amount.
+                Input recipient number <strong className="text-slate-900 font-mono">01315-980669</strong> (or 01315980669) and your specified tuition/service amount.
               </p>
             </div>
 
@@ -93,7 +93,7 @@ export const PaymentMethodsPage: React.FC = () => {
                 Finest Tutors BD Safety Guarantee
               </h3>
               <p className="text-sm text-slate-300 leading-relaxed">
-                To protect guardians, students, and tutors from fraud, Finest Tutors BD operates <strong>only one unified official number</strong> (<span className="text-cyan-300 font-mono font-bold">01356-542184</span>) across bKash, Nagad, and Rocket Personal accounts.
+                To protect guardians, students, and tutors from fraud, Finest Tutors BD operates <strong>only one unified official number</strong> (<span className="text-cyan-300 font-mono font-bold">01315-980669</span>) across bKash, Nagad, and Rocket Personal accounts.
               </p>
             </div>
           </div>

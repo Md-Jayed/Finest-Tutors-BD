@@ -14,8 +14,8 @@ export const PaymentMethods: React.FC<PaymentMethodsProps> = ({
 }) => {
   const [copiedIndex, setCopiedIndex] = useState<number | null>(null);
 
-  const paymentNumber = '01356-542184';
-  const cleanNumber = '01356542184';
+  const paymentNumber = '01315-980669';
+  const cleanNumber = '01315980669';
 
   const handleCopy = (index: number) => {
     if (navigator.clipboard) {
@@ -144,7 +144,7 @@ export const PaymentMethods: React.FC<PaymentMethodsProps> = ({
       <div className="p-3.5 rounded-xl bg-cyan-50/60 border border-cyan-100 flex items-center gap-2.5 text-xs text-slate-600">
         <ShieldCheck className="w-4 h-4 text-[#0072EA] shrink-0" />
         <span>
-          <strong className="text-slate-800">Security Notice:</strong> Always confirm the official number <strong className="text-[#0072EA] font-mono font-bold">01356-542184</strong> before completing any transaction. Finest Tutors BD never asks for payments to unlisted personal accounts.
+          <strong className="text-slate-800">Security Notice:</strong> Always confirm the official number <strong className="text-[#0072EA] font-mono font-bold">01315-980669</strong> before completing any transaction. Finest Tutors BD never asks for payments to unlisted personal accounts.
         </span>
       </div>
     </div>
