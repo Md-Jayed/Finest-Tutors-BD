@@ -235,7 +235,10 @@ export const RegistrationPage: React.FC = () => {
       newErrors.universityIdCardFile = 'University / College ID Card photo or PDF is required.';
     }
 
-    // 12. NID/Birth Certificate (Optional - no validation error needed)
+    // 12. NID/Birth Certificate (Required)
+    if (!formData.nidOrBirthCertificateFile) {
+      newErrors.nidOrBirthCertificateFile = 'NID or Birth Certificate photo or PDF is required.';
+    }
 
     // 13. Personal Photo (Required)
     if (!formData.personalPhotoFile) {
@@ -921,10 +924,10 @@ export const RegistrationPage: React.FC = () => {
                   )}
                 </div>
 
-                {/* 15. NID/Birth Certificate (Optional File) */}
+                {/* 15. NID/Birth Certificate (Required File) */}
                 <div id="nidOrBirthCertificateFile" className="md:col-span-2 space-y-1.5">
                   <label className="block text-sm font-semibold text-slate-800">
-                    NID / Birth Certificate <span className="text-slate-400 text-xs font-normal">(Optional)</span>
+                    NID / Birth Certificate <span className="text-red-500">*</span>
                   </label>
                   <input
                     type="file"
@@ -934,9 +937,9 @@ export const RegistrationPage: React.FC = () => {
                     className="hidden"
                   />
                   {formData.nidOrBirthCertificateFile ? (
-                    <div className="flex items-center justify-between p-3 rounded-xl border border-slate-200 bg-slate-50">
+                    <div className="flex items-center justify-between p-3 rounded-xl border border-emerald-200 bg-emerald-50/40">
                       <div className="flex items-center gap-2.5 min-w-0">
-                        <FileText className="w-5 h-5 text-slate-600 shrink-0" />
+                        <FileText className="w-5 h-5 text-emerald-600 shrink-0" />
                         <div className="truncate">
                           <p className="text-xs font-semibold text-slate-800 truncate">
                             {formData.nidOrBirthCertificateFile.name}
@@ -968,7 +971,11 @@ export const RegistrationPage: React.FC = () => {
                     <button
                       type="button"
                       onClick={() => nidRef.current?.click()}
-                      className="w-full p-4 rounded-xl border border-dashed border-slate-300 hover:border-slate-400 text-center flex flex-col items-center justify-center gap-1.5 bg-slate-50/60 hover:bg-slate-50 text-slate-600 transition-colors"
+                      className={`w-full p-4 rounded-xl border border-dashed text-center flex flex-col items-center justify-center gap-1.5 transition-colors ${
+                        errors.nidOrBirthCertificateFile
+                          ? 'border-red-300 bg-red-50/20 text-red-600'
+                          : 'border-slate-300 hover:border-[#0072EA] bg-slate-50/60 hover:bg-slate-50 text-slate-600'
+                      }`}
                     >
                       <Upload className="w-5 h-5 text-slate-400" />
                       <span className="text-xs font-medium">Choose file</span>

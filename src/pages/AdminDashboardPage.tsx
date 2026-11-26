@@ -1042,7 +1042,7 @@ export const AdminDashboardPage: React.FC = () => {
                       </div>
                     </div>
 
-                    {/* 3. NID / Birth Certificate (Optional) */}
+                    {/* 3. NID / Birth Certificate (Required) */}
                     <div className="border border-slate-200 rounded-2xl p-4 flex flex-col justify-between space-y-3 bg-white shadow-2xs">
                       <div className="space-y-1">
                         <div className="flex items-center justify-between">
@@ -1050,8 +1050,8 @@ export const AdminDashboardPage: React.FC = () => {
                             <FileText className="w-4 h-4 text-emerald-600" />
                             NID / Birth Certificate
                           </span>
-                          <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-slate-100 text-slate-600">
-                            Optional
+                          <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-emerald-100 text-emerald-800">
+                            Required
                           </span>
                         </div>
                         <p className="text-[11px] text-slate-500 truncate" title={selectedApplication.nidBirthCertificateFilePath || ''}>
